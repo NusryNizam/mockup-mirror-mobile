@@ -82,20 +82,6 @@ function App(): React.JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      {/* <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.dark.background : Colors.light.background,
-          }}>
-          <Section title="Connect with plugin">
-            Scan the QR on your plugin to connect.
-          </Section>
-
-
-        </View>
-      </ScrollView> */}
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Setup Your Connection</ThemedText>
         <ThemedText>Scan the QR Code to get started</ThemedText>
