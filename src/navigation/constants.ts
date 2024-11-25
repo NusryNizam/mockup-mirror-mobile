@@ -1,0 +1,4 @@
+export enum ROOT_STACK_SCREENS {
+    HOME = 'HOME',
+    PERMISSION = 'PERMISSION'
+}
