@@ -12,8 +12,7 @@ import {ThemedText} from "../components/ThemedText";
 import {ThemedView} from "../components/ThemedView";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {RootStackParamList} from "../navigation/RootStackNavigator";
-import { ROOT_STACK_SCREENS } from "../navigation/constants";
-
+import {ROOT_STACK_SCREENS} from "../navigation/constants";
 
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.PERMISSION>
@@ -33,8 +32,7 @@ export default function PermissionScreen({navigation}: Props) {
   const loaderColor = isDarkMode ? Colors.dark.tint : Colors.light.tint;
 
   const handleScan = (result: ScanningResult) => {
-    console.log("Scanned: ", result);
-    navigation.replace(ROOT_STACK_SCREENS.HOME, {data: result.data});
+    navigation.navigate(ROOT_STACK_SCREENS.HOME, {data: result.data ?? ''});
   };
 
   if (!permission) {
@@ -42,18 +40,6 @@ export default function PermissionScreen({navigation}: Props) {
     return (
       <ThemedView>
         <ActivityIndicator color={loaderColor} />
-      </ThemedView>
-    );
-  }
-
-  if (!permission.granted) {
-    return (
-      <ThemedView>
-        <ThemedText></ThemedText>
-        <ThemedText style={styles.message}>
-          We need your permission to show the camera
-        </ThemedText>
-        <ThemedButton text="Grant permission" onPress={requestPermission} />
       </ThemedView>
     );
   }
