@@ -47,7 +47,7 @@ import {
         <ThemedText
           type="defaultSemiBold"
           darkColor={Colors.dark.background}
-          lightColor={Colors.light.text}
+          lightColor={Colors.light.background}
           style={styles.buttonText}
         >
           {text}

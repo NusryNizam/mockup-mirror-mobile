@@ -5,21 +5,20 @@ import {ThemedText} from "../components/ThemedText";
 import {ROOT_STACK_SCREENS} from "../navigation/constants";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {RootStackParamList} from "../navigation/RootStackNavigator";
- 
-  
+import {usePeer} from "../hooks/usePeer";
+
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.HOME>
 >;
- 
 
 export default function HomeScreen({route}: Props) {
-  const data = route.params?.data ?? "";
-  console.log(data)
+  const qrData = route.params?.data ?? "";
+  const id = usePeer(qrData);
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText>Status: { }</ThemedText>
-      <ThemedText>Image: { }</ThemedText>
+      <ThemedText>ID: {id}</ThemedText>
+      <ThemedText>Image: {}</ThemedText>
     </ThemedView>
   );
 }
