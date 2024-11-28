@@ -53,6 +53,7 @@ export default function PermissionScreen({navigation}: Props) {
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Setup Your Connection</ThemedText>
         <ThemedText>Scan the QR Code to get started</ThemedText>
+        <ThemedText type="caption">Make sure both your devices are on the same Wi-Fi network.</ThemedText>
         <ThemedText></ThemedText>
 
         <CameraView
