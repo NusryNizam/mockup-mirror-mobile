@@ -1,4 +1,4 @@
-package com.mockupmirror
+package com.nusrynizam.mockupmirror
 import android.os.Bundle
 import expo.modules.ReactActivityDelegateWrapper
 
@@ -13,7 +13,7 @@ class MainActivity : ReactActivity() {
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
    */
-  override fun getMainComponentName(): String = "MockupMirror"
+  override fun getMainComponentName(): String = "Mockup Mirror"
 
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]

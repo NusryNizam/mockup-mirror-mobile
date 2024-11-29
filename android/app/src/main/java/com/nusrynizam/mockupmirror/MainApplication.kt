@@ -1,4 +1,4 @@
-package com.mockupmirror
+package com.nusrynizam.mockupmirror
 import android.content.res.Configuration
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper

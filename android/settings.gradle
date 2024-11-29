@@ -13,7 +13,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
   ].toList()
   ex.autolinkLibrariesFromCommand(command)
 }
-rootProject.name = 'MockupMirror'
+rootProject.name = 'Mockup Mirror'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
