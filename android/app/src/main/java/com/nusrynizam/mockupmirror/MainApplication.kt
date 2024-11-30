@@ -1,4 +1,4 @@
-package com.mockupmirrormobile
+package com.nusrynizam.mockupmirror
 
 import android.app.Application
 import com.facebook.react.PackageList

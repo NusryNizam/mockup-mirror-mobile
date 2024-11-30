@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface MockupMirrorMobileTests : XCTestCase
+@interface MockupMirrorTests : XCTestCase
 
 @end
 
-@implementation MockupMirrorMobileTests
+@implementation MockupMirrorTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {
