@@ -32,7 +32,7 @@ export default function PermissionScreen({navigation}: Props) {
   const loaderColor = isDarkMode ? Colors.dark.tint : Colors.light.tint;
 
   const handleScan = (result: ScanningResult) => {
-    navigation.navigate(ROOT_STACK_SCREENS.HOME, {data: result.data ?? ''});
+    navigation.replace(ROOT_STACK_SCREENS.HOME, {data: result.data ?? ''});
   };
 
   if (!permission) {
@@ -53,7 +53,7 @@ export default function PermissionScreen({navigation}: Props) {
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Setup Your Connection</ThemedText>
         <ThemedText>Scan the QR Code to get started</ThemedText>
-        <ThemedText type="caption">Make sure both your devices are on the same Wi-Fi network.</ThemedText>
+        <ThemedText type="caption">Make sure both your devices are on the same Wi-Fi network</ThemedText>
         <ThemedText></ThemedText>
 
         <CameraView

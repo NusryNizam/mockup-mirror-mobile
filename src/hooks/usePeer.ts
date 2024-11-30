@@ -1,5 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
-import ReactNativeBlobUtil from "react-native-blob-util";
+import {useEffect, useState} from "react";
 import Peer from "react-native-peerjs";
 
 import {ImageStreamHandler} from "../classes/ImageHandler";
@@ -8,6 +7,11 @@ export const usePeer = (qrData: string) => {
   const [peer] = useState(new Peer()); // Create peer instance once
   const [id, setId] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+
+  const clearImages = () => {
+    setImages([]);
+  };
 
   useEffect(() => {
     const imageHandler = new ImageStreamHandler();
@@ -15,6 +19,7 @@ export const usePeer = (qrData: string) => {
     try {
       // 1. Initialize peer first
       peer.on("open", (myId: string) => {
+        setIsConnected(true);
         console.log("My peer ID:", myId);
 
         // 2. Then try to connect to the scanned peer
@@ -31,7 +36,7 @@ export const usePeer = (qrData: string) => {
         conn.on("open", () => {
           // Remove the id parameter - it's not provided
           console.log("Connection opened with:", conn.peer);
-
+          setIsConnected(true);
           // 5. Send data
           // try {
           //   const message = "Hi!!";
@@ -46,10 +51,6 @@ export const usePeer = (qrData: string) => {
           // }
         });
 
-        conn.on("error", (error: any) => {
-          console.error("Connection error:", error);
-        });
-
         conn.on("data", async (data: Uint8Array) => {
           try {
             imageHandler.handleChunk(data);
@@ -58,6 +59,16 @@ export const usePeer = (qrData: string) => {
             console.error("Error decoding received message:", error);
           }
         });
+
+        conn.on("error", (error: any) => {
+          console.error("Connection error:", error);
+          setIsConnected(false);
+        });
+
+        conn.on("close", () => {
+          setIsConnected(false);
+          console.log("Connection closed");
+        });
       });
     } catch (error) {
       console.error("Error in connection setup:", error);
@@ -65,8 +76,9 @@ export const usePeer = (qrData: string) => {
 
     return () => {
       peer.destroy();
+      setIsConnected(false);
     };
   }, [qrData]);
 
-  return {id, images};
+  return {id, images, clearImages, isConnected};
 };
