@@ -23,9 +23,6 @@ export default function HomeScreen({route}: Props) {
   const qrData = route.params?.data ?? "";
   const {images} = usePeer(qrData);
 
-  console.log("Images");
-  console.log(images);
-
   const renderImage = useCallback(({item}: ListRenderItemInfo<string>) => {
     return (
       <ScrollView

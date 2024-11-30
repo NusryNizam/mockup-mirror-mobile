@@ -19,7 +19,6 @@ export const usePeer = (qrData: string) => {
 
         // 2. Then try to connect to the scanned peer
         const decodedData = atob(qrData);
-        console.log("Decoded peer ID:", decodedData);
         setId(decodedData);
 
         // 3. Create connection
