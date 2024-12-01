@@ -1,25 +1,27 @@
-import {Text, type TextProps, StyleSheet} from "react-native";
-import React from "react";
+import {Text, type TextProps, StyleSheet} from 'react-native';
+import React from 'react';
 
-import {createStyleSheet, useStyles} from "../hooks/useStyles";
-import {useColors} from "../contexts/ColorContext";
+import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import {useColors} from '../contexts/ColorContext';
 
 export type ThemedTextProps = TextProps & {
   color?: string;
   type?:
-    | "default"
-    | "title"
-    | "defaultSemiBold"
-    | "subtitle"
-    | "link"
-    | "caption"
-    | "small";
+    | 'default'
+    | 'title'
+    | 'defaultSemiBold'
+    | 'subtitle'
+    | 'link'
+    | 'caption'
+    | 'small';
+  smallText?: boolean;
 };
 
 export function ThemedText({
   style,
   color,
-  type = "default",
+  type = 'default',
+  smallText = false,
   ...rest
 }: ThemedTextProps) {
   const styles = useStyles(stylesFn);
@@ -30,14 +32,15 @@ export function ThemedText({
     <Text
       style={[
         {color: color ?? textColor},
-        type === "default" ? styles.default : undefined,
-        type === "title" ? styles.title : undefined,
-        type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
-        type === "subtitle" ? styles.subtitle : undefined,
-        type === "link" ? styles.link : undefined,
-        type === "caption" ? styles.caption : undefined,
-        type === "small" ? styles.small : undefined,
+        type === 'default' ? styles.default : undefined,
+        type === 'title' ? styles.title : undefined,
+        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
+        type === 'subtitle' ? styles.subtitle : undefined,
+        type === 'link' ? styles.link : undefined,
+        type === 'caption' ? styles.caption : undefined,
+        type === 'small' ? styles.small : undefined,
         style,
+        smallText ? styles.small : undefined,
       ]}
       {...rest}
     />
@@ -52,21 +55,21 @@ const stylesFn = createStyleSheet(color => ({
   defaultSemiBold: {
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   title: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     lineHeight: 32,
   },
   subtitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: "#0a7ea4",
+    color: color.status.info500,
   },
   caption: {
     fontSize: 16,

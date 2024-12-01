@@ -4,9 +4,7 @@ import {
   Pressable,
   ScrollView,
   StatusBar,
-  StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
 } from 'react-native';
 
 import {ThemedView} from '../components/ThemedView';
@@ -24,31 +22,31 @@ import {useCallback, useEffect, useState} from 'react';
 import {Svgs} from '../themes/svgs';
 import ThemedIconButton from '../components/ThemedIconButton';
 import {useNavigation} from '@react-navigation/native';
-import {ThemedButton} from '../components/ThemedButton';
-import {useColors} from '../contexts/ColorContext';
 import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import Spacer from '../components/Spacer';
+import ThemedIcon from '../components/ThemedIcon';
 
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.HOME>
 >;
 export default function HomeScreen({route}: Props) {
-  const {colors} = useColors();
   const styles = useStyles(stylesFn);
 
   const [isOverlay, setIsOverlay] = useState(false);
   const qrData = route.params?.data ?? '';
-  const {images, clearImages, isConnected} = usePeer(qrData);
+  const {images, clearImages, isConnected, disconnect} = usePeer(qrData);
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleClearImages = useCallback(() => {
     clearImages();
-  }, []);
+  }, [clearImages]);
 
   const handleReconnect = useCallback(() => {
+    disconnect();
     navigation.replace(ROOT_STACK_SCREENS.PERMISSION);
-  }, []);
+  }, [navigation]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -96,27 +94,31 @@ export default function HomeScreen({route}: Props) {
         <ThemedView style={{height: 64}}></ThemedView>
 
         <ThemedView style={styles.row}>
-          <Svgs.SwipeHorizontal
-            opacity={0.5}
-            fill={colors.foreground.secondary}
-          />
+          <ThemedIcon name="SwipeHorizontal" opacity={0.4} />
           <ThemedText type="small" style={{opacity: 0.5}}>
             Swipe left to view the next board
           </ThemedText>
         </ThemedView>
 
         <ThemedView style={styles.row}>
-          <Svgs.SwipeVertical
-            opacity={0.5}
-            fill={colors.foreground.secondary}
-          />
+          <ThemedIcon name="SwipeVertical" opacity={0.4} />
           <ThemedText type="small" style={{opacity: 0.5}}>
             Swipe up/down to scroll long boards
           </ThemedText>
         </ThemedView>
+
+        <Spacer height={32} />
+        <TouchableOpacity onPress={handleReconnect}>
+          <ThemedText
+            type="link"
+            smallText={true}
+            style={{textDecorationLine: 'underline'}}>
+            Reset Connection
+          </ThemedText>
+        </TouchableOpacity>
       </ThemedView>
     );
-  }, []);
+  }, [handleReconnect]);
 
   return (
     <ThemedView style={styles.container}>
@@ -155,7 +157,7 @@ export default function HomeScreen({route}: Props) {
   );
 }
 
-const stylesFn = createStyleSheet((color) => ({
+const stylesFn = createStyleSheet(color => ({
   container: {
     flex: 1,
   },
@@ -180,7 +182,6 @@ const stylesFn = createStyleSheet((color) => ({
   emptyText: {
     textAlign: 'center',
   },
-
   overlay: {
     position: 'absolute',
     zIndex: 1,
@@ -194,14 +195,6 @@ const stylesFn = createStyleSheet((color) => ({
     gap: 12,
     justifyContent: 'center',
   },
-
-  lostText: {
-    textAlign: 'center',
-    width: DEVICE_WIDTH - 48,
-    marginBottom: 8,
-    color: 'red',
-  },
-
   row: {
     flexDirection: 'row',
     gap: 16,

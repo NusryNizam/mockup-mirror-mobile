@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 // since this doesn't have TS bindings
 // @ts-ignore
@@ -12,9 +12,13 @@ export const usePeer = (qrData: string) => {
   const [images, setImages] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
 
-  const clearImages = () => {
+  const clearImages = useCallback(() => {
     setImages([]);
-  };
+  }, []);
+
+  const disconnect = useCallback(() => {
+    peer.disconnect();
+  }, [peer]);
 
   useEffect(() => {
     const imageHandler = new ImageStreamHandler();
@@ -22,7 +26,6 @@ export const usePeer = (qrData: string) => {
     try {
       // 1. Initialize peer first
       peer.on('open', (myId: string) => {
-        setIsConnected(true);
         console.log('My peer ID:', myId);
 
         // 2. Then try to connect to the scanned peer
@@ -37,21 +40,8 @@ export const usePeer = (qrData: string) => {
 
         // 4. Handle connection events
         conn.on('open', () => {
-          // Remove the id parameter - it's not provided
           console.log('Connection opened with:', conn.peer);
           setIsConnected(true);
-          // 5. Send data
-          // try {
-          //   const message = "Hi!!";
-          //   // const encodedMessage = btoa(message);
-
-          //   const encoder = new TextEncoder();
-          //   const encodedData = encoder.encode(message);
-          //   conn.send(encodedData.buffer);
-          //   console.log("Sent message:", message);
-          // } catch (error) {
-          //   console.error("Error sending message:", error);
-          // }
         });
 
         conn.on('data', async (data: Uint8Array) => {
@@ -81,7 +71,7 @@ export const usePeer = (qrData: string) => {
       peer.destroy();
       setIsConnected(false);
     };
-  }, [qrData]);
+  }, [qrData, peer]);
 
-  return {id, images, clearImages, isConnected};
+  return {id, images, clearImages, isConnected, disconnect};
 };
