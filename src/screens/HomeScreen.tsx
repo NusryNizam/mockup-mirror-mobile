@@ -70,6 +70,7 @@ export default function HomeScreen({route}: Props) {
             inset: 0,
             height: '100%',
             backgroundColor: 'transparent',
+            width: DEVICE_WIDTH,
             zIndex: 1,
           }}
           onPress={() => setIsOverlay(true)}></Pressable>

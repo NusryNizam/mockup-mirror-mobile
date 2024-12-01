@@ -1,9 +1,4 @@
-import {
-  StyleSheet,
-  ActivityIndicator,
-  StatusBar,
-  useColorScheme,
-} from 'react-native';
+import {StatusBar, useColorScheme} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {ThemedButton} from '../components/ThemedButton';
@@ -38,7 +33,6 @@ export default function PermissionScreen({navigation}: Props) {
       ? Colors.dark.background
       : Colors.light.background,
   };
-
 
   const handleScan = (result: Code[]) => {
     navigation.replace(ROOT_STACK_SCREENS.HOME, {data: result[0].value ?? ''});
