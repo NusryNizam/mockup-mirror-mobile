@@ -44,6 +44,7 @@
     "patch-package": "^8.0.0",
     "prettier": "2.8.8",
     "react-native-auto-height-image": "^3.2.4",
+    "react-native-bootsplash": "^6.3.2",
     "react-native-peerjs": "^1.0.4",
     "react-native-safe-area-context": "^4.14.0",
     "react-native-screens": "^4.3.0",
