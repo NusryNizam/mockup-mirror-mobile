@@ -4,10 +4,8 @@ import {RootStack} from './src/navigation/RootStackNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 import {Colors} from './src/constants/Colors';
 import {ColorProvider} from './src/contexts/ColorContext';
-import {useBootsplash} from './src/hooks/useBootsplash';
 
 function App(): React.JSX.Element {
-  useBootsplash();
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
