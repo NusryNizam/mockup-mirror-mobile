@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   ListRenderItemInfo,
   Pressable,
@@ -18,13 +19,14 @@ import {RootStackParamList} from '../navigation/RootStackNavigator';
 import {usePeer} from '../hooks/usePeer';
 import {DEVICE_HEIGHT, DEVICE_WIDTH} from '../constants/constants';
 import AutoHeightImage from 'react-native-auto-height-image';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {Svgs} from '../themes/svgs';
 import ThemedIconButton from '../components/ThemedIconButton';
 import {useNavigation} from '@react-navigation/native';
 import {createStyleSheet, useStyles} from '../hooks/useStyles';
 import Spacer from '../components/Spacer';
 import ThemedIcon from '../components/ThemedIcon';
+import {useColors} from '../contexts/ColorContext';
 
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.HOME>
@@ -32,10 +34,13 @@ type Props = Readonly<
 export default function HomeScreen({route}: Props) {
   const styles = useStyles(stylesFn);
 
+  const flatlistRef = useRef<FlatList>(null);
   const [isOverlay, setIsOverlay] = useState(false);
   const qrData = route.params?.data ?? '';
-  const {images, clearImages, isConnected, disconnect} = usePeer(qrData);
+  const {images, clearImages, isConnected, disconnect, isStreamingData} =
+    usePeer(qrData);
 
+  const {colors} = useColors();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -58,6 +63,12 @@ export default function HomeScreen({route}: Props) {
 
     return () => clearTimeout(timeout);
   });
+
+  useEffect(() => {
+    if (!isStreamingData) {
+      flatlistRef.current?.scrollToOffset({animated: true, offset: 0});
+    }
+  }, [isStreamingData]);
 
   const renderImage = useCallback(({item}: ListRenderItemInfo<string>) => {
     return (
@@ -144,6 +155,7 @@ export default function HomeScreen({route}: Props) {
       ) : null}
 
       <FlatList
+        ref={flatlistRef}
         style={styles.flatlist}
         horizontal={true}
         data={images}
@@ -152,7 +164,16 @@ export default function HomeScreen({route}: Props) {
         snapToAlignment="start"
         decelerationRate="fast"
         snapToInterval={DEVICE_WIDTH}
-        ListEmptyComponent={renderEmptyComponent}
+        ListEmptyComponent={
+          isStreamingData ? (
+            <ThemedView style={styles.fullscreen}>
+              <ActivityIndicator size={20} color={colors.accent.primary} />
+            </ThemedView>
+          ) : (
+            renderEmptyComponent
+          )
+        }
+        showsHorizontalScrollIndicator={false}
       />
     </ThemedView>
   );
@@ -200,6 +221,12 @@ const stylesFn = createStyleSheet(color => ({
     flexDirection: 'row',
     gap: 16,
     padding: 8,
+    alignItems: 'center',
+  },
+  fullscreen: {
+    width: DEVICE_WIDTH,
+    height: DEVICE_HEIGHT,
+    justifyContent: 'center',
     alignItems: 'center',
   },
 }));

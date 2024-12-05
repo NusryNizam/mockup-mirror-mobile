@@ -6,14 +6,18 @@ import Peer from 'react-native-peerjs';
 
 import {ImageStreamHandler} from '../classes/ImageHandler';
 
+const imageHandler = new ImageStreamHandler();
+
 export const usePeer = (qrData: string) => {
   const [peer] = useState(new Peer()); // Create peer instance once
   const [id, setId] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isStreamingData, setIsStreamingData] = useState(false);
 
   const clearImages = useCallback(() => {
     setImages([]);
+    imageHandler.reset();
   }, []);
 
   const disconnect = useCallback(() => {
@@ -21,8 +25,6 @@ export const usePeer = (qrData: string) => {
   }, [peer]);
 
   useEffect(() => {
-    const imageHandler = new ImageStreamHandler();
-
     try {
       // 1. Initialize peer first
       peer.on('open', (myId: string) => {
@@ -47,7 +49,10 @@ export const usePeer = (qrData: string) => {
         conn.on('data', async (data: Uint8Array) => {
           try {
             imageHandler.handleChunk(data);
-            setImages(imageHandler.getImages());
+
+            if (!isStreamingData) {
+              setImages(imageHandler.getImages() ?? []);
+            }
           } catch (error) {
             console.error('Error decoding received message:', error);
           }
@@ -73,5 +78,18 @@ export const usePeer = (qrData: string) => {
     };
   }, [qrData, peer]);
 
-  return {id, images, clearImages, isConnected, disconnect};
+  useEffect(() => {
+    const unsubscribeStreaming = imageHandler.subscribe(
+      'streamingStateChanged',
+      (newState: boolean) => {
+        setIsStreamingData(newState);
+      },
+    );
+
+    return () => {
+      unsubscribeStreaming();
+    };
+  }, []);
+
+  return {id, images, clearImages, isConnected, disconnect, isStreamingData};
 };
