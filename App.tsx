@@ -1,9 +1,9 @@
 import React from 'react';
-import {StatusBar, useColorScheme} from 'react-native';
-import {RootStack} from './src/navigation/RootStackNavigator';
-import {NavigationContainer} from '@react-navigation/native';
-import {Colors} from './src/constants/Colors';
-import {ColorProvider} from './src/contexts/ColorContext';
+import { StatusBar, useColorScheme } from 'react-native';
+import { RootStack } from './src/navigation/RootStackNavigator';
+import { NavigationContainer } from '@react-navigation/native';
+import { Colors } from './src/constants/Colors';
+import { ColorProvider } from './src/contexts/ColorContext';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -17,7 +17,7 @@ function App(): React.JSX.Element {
     <NavigationContainer>
       <ColorProvider>
         <StatusBar
-          hidden={false}
+          hidden={true}
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           backgroundColor={backgroundStyle.backgroundColor}
         />

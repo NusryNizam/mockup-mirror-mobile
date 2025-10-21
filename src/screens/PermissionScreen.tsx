@@ -1,41 +1,41 @@
-import {StatusBar, useColorScheme} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {ThemedButton} from '../components/ThemedButton';
-import {ThemedText} from '../components/ThemedText';
-import {ThemedView} from '../components/ThemedView';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../navigation/RootStackNavigator';
-import {ROOT_STACK_SCREENS} from '../navigation/constants';
+import { StatusBar, useColorScheme } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedButton } from '../components/ThemedButton';
+import { ThemedText } from '../components/ThemedText';
+import { ThemedView } from '../components/ThemedView';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/RootStackNavigator';
+import { ROOT_STACK_SCREENS } from '../navigation/constants';
 import {
   useCameraPermission,
   useCameraDevice,
   Camera,
   Code,
 } from 'react-native-vision-camera';
-import {DEVICE_WIDTH} from '../constants/constants';
-import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import { DEVICE_WIDTH } from '../constants/constants';
+import { createStyleSheet, useStyles } from '../hooks/useStyles';
 import Spacer from '../components/Spacer';
+import { Colors } from '../constants/Colors';
 
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.PERMISSION>
 >;
 
-export default function PermissionScreen({navigation}: Props) {
+export default function PermissionScreen({ navigation }: Props) {
   const styles = useStyles(stylesFn);
-  const {hasPermission, requestPermission} = useCameraPermission();
+  const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
 
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode
-      ? Colors.dark.background
-      : Colors.light.background,
+      ? Colors.dark.background.primary
+      : Colors.light.background.primary,
   };
 
   const handleScan = (result: Code[]) => {
-    navigation.replace(ROOT_STACK_SCREENS.HOME, {data: result[0].value ?? ''});
+    navigation.replace(ROOT_STACK_SCREENS.HOME, { data: result[0].value ?? '' });
   };
 
   return (
