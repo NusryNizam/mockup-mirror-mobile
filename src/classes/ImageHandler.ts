@@ -1,5 +1,7 @@
 import 'text-encoding';
 
+declare const TextDecoder: new () => {decode(data?: BufferSource): string};
+
 const PROTOCOL = {
   STREAM_START: 'STREAM START',
   STREAM_END: 'STREAM END',
@@ -7,20 +9,31 @@ const PROTOCOL = {
   END: 'END',
 } as const;
 
+type StreamingListener = (streaming: boolean) => void;
+type ImageAddedListener = (images: string[]) => void;
+
 export class ImageStreamHandler {
   private decoder = new TextDecoder();
   private currentImage: string[] = [];
   private images: string[] = [];
   private isReceiving = false;
-  private listeners: ((streaming: boolean) => void)[] = [];
+  private streamingListeners: StreamingListener[] = [];
+  private imageAddedListeners: ImageAddedListener[] = [];
 
-  handleChunk(data: Uint8Array) {
-    const decodedData = this.decoder.decode(data);
+  handleChunk(data: Uint8Array | ArrayBuffer | string) {
+    const decodedData =
+      typeof data === 'string'
+        ? data
+        : this.decoder.decode(
+            data instanceof ArrayBuffer ? new Uint8Array(data) : data,
+          );
 
     switch (decodedData) {
       case PROTOCOL.STREAM_START:
         this.images = [];
-        this.listeners.forEach(fn => fn(true));
+        this.currentImage = [];
+        this.isReceiving = false;
+        this.streamingListeners.forEach(fn => fn(true));
         break;
 
       case PROTOCOL.START:
@@ -28,14 +41,19 @@ export class ImageStreamHandler {
         this.currentImage = [];
         break;
 
-      case PROTOCOL.END:
+      case PROTOCOL.END: {
         this.isReceiving = false;
         this.images.push(this.currentImage.join(''));
         this.currentImage = [];
+        const snapshot = this.images.map(
+          b64 => `data:image/jpeg;base64,${b64}`,
+        );
+        this.imageAddedListeners.forEach(fn => fn(snapshot));
         break;
+      }
 
       case PROTOCOL.STREAM_END:
-        this.listeners.forEach(fn => fn(false));
+        this.streamingListeners.forEach(fn => fn(false));
         break;
 
       default:
@@ -45,25 +63,32 @@ export class ImageStreamHandler {
     }
   }
 
-  getImages(): string[] {
-    if (this.isReceiving) {
-      return [];
-    }
-    return this.images.map(base64 => `data:image/png;base64,${base64}`);
-  }
+  subscribe(
+    event: 'streamingStateChanged',
+    callback: StreamingListener,
+  ): () => void;
 
-  getIsReceiving() {
-    return this.isReceiving;
-  }
+  subscribe(event: 'imageAdded', callback: ImageAddedListener): () => void;
 
   subscribe(
-    _event: 'streamingStateChanged',
-    callback: (streaming: boolean) => void,
-  ) {
-    this.listeners.push(callback);
-    return () => {
-      this.listeners = this.listeners.filter(fn => fn !== callback);
-    };
+    event: 'streamingStateChanged' | 'imageAdded',
+    callback: StreamingListener | ImageAddedListener,
+  ): () => void {
+    if (event === 'streamingStateChanged') {
+      this.streamingListeners.push(callback as StreamingListener);
+      return () => {
+        this.streamingListeners = this.streamingListeners.filter(
+          fn => fn !== callback,
+        );
+      };
+    } else {
+      this.imageAddedListeners.push(callback as ImageAddedListener);
+      return () => {
+        this.imageAddedListeners = this.imageAddedListeners.filter(
+          fn => fn !== callback,
+        );
+      };
+    }
   }
 
   reset() {
