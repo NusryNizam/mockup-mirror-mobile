@@ -7,6 +7,21 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [2.0.3] — 2026-05-10
+
+### Changed
+
+- `ImageStreamHandler` now emits an `imageAdded` event after each complete image instead of requiring callers to poll `getImages()`
+- `handleChunk` now accepts `ArrayBuffer` and `string` inputs in addition to `Uint8Array`
+- Streaming state is reset on `STREAM_START` to prevent stale images carrying over between sessions
+- Images are now emitted as JPEG data URIs
+
+### Fixed
+
+- Image list in the board viewer is now cleared immediately when a new stream starts
+
+---
+
 ## [2.0.2] — 2026-05-10
 
 ### Fixed
