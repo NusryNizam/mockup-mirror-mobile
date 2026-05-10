@@ -1,3 +1,10 @@
+/* eslint-disable react-native/no-inline-styles */
+import {useNavigation} from '@react-navigation/native';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -7,26 +14,20 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
-
-import {ThemedView} from '../components/ThemedView';
-import {ThemedText} from '../components/ThemedText';
-import {ROOT_STACK_SCREENS} from '../navigation/constants';
-import {
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../navigation/RootStackNavigator';
-import {usePeer} from '../hooks/usePeer';
-import {DEVICE_HEIGHT, DEVICE_WIDTH} from '../constants/constants';
 import AutoHeightImage from 'react-native-auto-height-image';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {Svgs} from '../themes/svgs';
-import ThemedIconButton from '../components/ThemedIconButton';
-import {useNavigation} from '@react-navigation/native';
-import {createStyleSheet, useStyles} from '../hooks/useStyles';
+
 import Spacer from '../components/Spacer';
 import ThemedIcon from '../components/ThemedIcon';
+import ThemedIconButton from '../components/ThemedIconButton';
+import {ThemedText} from '../components/ThemedText';
+import {ThemedView} from '../components/ThemedView';
+import {DEVICE_HEIGHT, DEVICE_WIDTH} from '../constants/constants';
 import {useColors} from '../contexts/ColorContext';
+import {usePeer} from '../hooks/usePeer';
+import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import {ROOT_STACK_SCREENS} from '../navigation/constants';
+import {RootStackParamList} from '../navigation/RootStackNavigator';
+import {Svgs} from '../themes/svgs';
 
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.HOME>
@@ -37,32 +38,23 @@ export default function HomeScreen({route}: Props) {
   const flatlistRef = useRef<FlatList>(null);
   const [isOverlay, setIsOverlay] = useState(false);
   const qrData = route.params?.data ?? '';
-  const {images, clearImages, isConnected, disconnect, isStreamingData} =
+  const {images, clearImages, isConnected, disconnect, isStreamingData, error} =
     usePeer(qrData);
 
   const {colors} = useColors();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const handleClearImages = useCallback(() => {
-    clearImages();
-  }, [clearImages]);
-
   const handleReconnect = useCallback(() => {
     disconnect();
     navigation.replace(ROOT_STACK_SCREENS.PERMISSION);
-  }, [navigation]);
+  }, [disconnect, navigation]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (isOverlay) {
-      setTimeout(() => {
-        setIsOverlay(false);
-      }, 3000);
-    }
-
+    if (!isOverlay) return;
+    const timeout = setTimeout(() => setIsOverlay(false), 3000);
     return () => clearTimeout(timeout);
-  });
+  }, [isOverlay]);
 
   useEffect(() => {
     if (!isStreamingData) {
@@ -70,30 +62,24 @@ export default function HomeScreen({route}: Props) {
     }
   }, [isStreamingData]);
 
-  const renderImage = useCallback(({item}: ListRenderItemInfo<string>) => {
-    return (
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}>
-        <Pressable
-          style={{
-            position: 'absolute',
-            inset: 0,
-            height: '100%',
-            backgroundColor: 'transparent',
-            width: DEVICE_WIDTH,
-            zIndex: 1,
-          }}
-          onPress={() => setIsOverlay(true)}></Pressable>
-        <AutoHeightImage width={DEVICE_WIDTH} source={{uri: item}} />
-      </ScrollView>
-    );
-  }, []);
+  const renderImage = useCallback(
+    ({item}: ListRenderItemInfo<string>) => {
+      return (
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}>
+          <Pressable style={styles.button} onPress={() => setIsOverlay(true)} />
+          <AutoHeightImage width={DEVICE_WIDTH} source={{uri: item}} />
+        </ScrollView>
+      );
+    },
+    [styles.button, styles.scrollView],
+  );
 
   const renderEmptyComponent = useCallback(() => {
     return (
       <ThemedView style={styles.empty}>
-        <ThemedView style={{height: 32}}></ThemedView>
+        <ThemedView style={{height: 32}} />
         <ThemedText
           style={{...styles.emptyText, ...styles.mainText}}
           type="defaultSemiBold">
@@ -103,7 +89,7 @@ export default function HomeScreen({route}: Props) {
           Select one or more boards in Penpot to preview{'\n'}
         </ThemedText>
 
-        <ThemedView style={{height: 64}}></ThemedView>
+        <ThemedView style={{height: 64}} />
 
         <ThemedView style={styles.row}>
           <ThemedIcon name="SwipeHorizontal" opacity={0.4} />
@@ -120,6 +106,18 @@ export default function HomeScreen({route}: Props) {
         </ThemedView>
 
         <Spacer height={32} />
+        {error ? (
+          <ThemedText
+            type="small"
+            style={{
+              opacity: 0.7,
+              color: 'red',
+              textAlign: 'center',
+              marginBottom: 8,
+            }}>
+            {error}
+          </ThemedText>
+        ) : null}
         <TouchableOpacity onPress={handleReconnect}>
           <ThemedText
             type="link"
@@ -130,7 +128,14 @@ export default function HomeScreen({route}: Props) {
         </TouchableOpacity>
       </ThemedView>
     );
-  }, [handleReconnect]);
+  }, [
+    error,
+    handleReconnect,
+    styles.empty,
+    styles.emptyText,
+    styles.mainText,
+    styles.row,
+  ]);
 
   return (
     <ThemedView style={styles.container}>
@@ -141,7 +146,7 @@ export default function HomeScreen({route}: Props) {
           <ThemedIconButton
             Icon={Svgs.Clear}
             action="Clear Images"
-            onPress={handleClearImages}
+            onPress={clearImages}
           />
 
           {isConnected ? null : (
@@ -159,7 +164,12 @@ export default function HomeScreen({route}: Props) {
         style={styles.flatlist}
         horizontal={true}
         data={images}
-        renderItem={image => renderImage(image)}
+        renderItem={renderImage}
+        getItemLayout={(_, index) => ({
+          length: DEVICE_WIDTH,
+          offset: DEVICE_WIDTH * index,
+          index,
+        })}
         keyExtractor={(_, index) => index.toString()}
         snapToAlignment="start"
         decelerationRate="fast"
@@ -179,7 +189,7 @@ export default function HomeScreen({route}: Props) {
   );
 }
 
-const stylesFn = createStyleSheet(color => ({
+const stylesFn = createStyleSheet(_color => ({
   container: {
     flex: 1,
   },
@@ -228,5 +238,13 @@ const stylesFn = createStyleSheet(color => ({
     height: DEVICE_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  button: {
+    position: 'absolute',
+    inset: 0,
+    height: '100%',
+    backgroundColor: 'transparent',
+    width: DEVICE_WIDTH,
+    zIndex: 1,
   },
 }));

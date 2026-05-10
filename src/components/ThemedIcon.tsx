@@ -1,6 +1,7 @@
-import {Svgs} from '../themes/svgs';
 import {SvgProps} from 'react-native-svg';
+
 import {useColors} from '../contexts/ColorContext';
+import {Svgs} from '../themes/svgs';
 
 type Props = {
   name: keyof typeof Svgs;

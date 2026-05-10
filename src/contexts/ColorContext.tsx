@@ -1,6 +1,7 @@
-import React, {createContext, useContext, useMemo} from "react";
-import {useColorScheme} from "react-native";
-import {Colors, ThemeColors} from "../constants/Colors";
+import React, {createContext, useContext, useMemo} from 'react';
+import {useColorScheme} from 'react-native';
+
+import {Colors, ThemeColors} from '../constants/Colors';
 
 interface IColorContext {
   colors: ThemeColors;
@@ -22,7 +23,7 @@ export const ColorProvider = ({children}: ColorProviderProps) => {
     colors: ThemeColors;
   } = useMemo(
     () => ({
-      colors: selectedTheme === "light" ? Colors.light : Colors.dark,
+      colors: selectedTheme === 'light' ? Colors.light : Colors.dark,
     }),
     [selectedTheme],
   );
@@ -37,7 +38,7 @@ export const ColorProvider = ({children}: ColorProviderProps) => {
 export const useColors = (): IColorContext => {
   const context = useContext(ColorContext);
   if (context === undefined) {
-    throw new Error("useColors must be used within a ColorProvider");
+    throw new Error('useColors must be used within a ColorProvider');
   }
   return context;
 };

@@ -1,7 +1,8 @@
 import {useMemo} from 'react';
 import {StyleSheet} from 'react-native';
-import {useColors} from '../contexts/ColorContext';
+
 import {ThemeColors} from '../constants/Colors';
+import {useColors} from '../contexts/ColorContext';
 
 export function useStyles<T>(stylesFunc: (colors: ThemeColors) => T): T {
   const {colors} = useColors();

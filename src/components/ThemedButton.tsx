@@ -1,25 +1,17 @@
-import React, {useMemo} from 'react';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  TouchableOpacityProps,
-} from 'react-native';
+import {useMemo} from 'react';
+import {TouchableOpacity, TouchableOpacityProps} from 'react-native';
 
-import {ThemedText} from './ThemedText';
-import {createStyleSheet, useStyles} from '../hooks/useStyles';
 import {useColors} from '../contexts/ColorContext';
+import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import {ThemedText} from './ThemedText';
 
 export type ThemedButtonProps = TouchableOpacityProps & {
-  lightColor?: string;
-  darkColor?: string;
   type?: 'primary' | 'secondary' | 'ghost';
   text: string;
 };
 
 export function ThemedButton({
   style,
-  lightColor,
-  darkColor,
   type = 'primary',
   text,
   ...rest
@@ -57,61 +49,28 @@ export function ThemedButton({
         };
       }
     }
-  }, []);
+  }, [
+    colors.accent.primary,
+    colors.background.primary,
+    colors.background.tertiary,
+    colors.foreground.primary,
+    colors.foreground.secondary,
+    type,
+  ]);
 
   return (
-    <TouchableOpacity
-      style={[
-        mainStyle,
-        type === 'primary' ? styles.primary : undefined,
-        type === 'secondary' ? styles.secondary : undefined,
-        type === 'ghost' ? styles.ghost : undefined,
-        styles.button,
-        style,
-      ]}
-      {...rest}>
-      <ThemedText type="defaultSemiBold" style={styles.buttonText} color={mainStyle.color}>
+    <TouchableOpacity style={[mainStyle, styles.button, style]} {...rest}>
+      <ThemedText
+        type="defaultSemiBold"
+        style={styles.buttonText}
+        color={mainStyle.color}>
         {text}
       </ThemedText>
     </TouchableOpacity>
   );
 }
 
-// const styles = StyleSheet.create({
-//   button: {
-//     paddingBlock: 4,
-//     borderRadius: 4,
-//     minHeight: 40,
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   buttonText: {
-//     textAlign: "center",
-//     textTransform: "uppercase",
-//   },
-//   primary: {},
-//   secondary: {
-//     // fontSize: 16,
-//     // lineHeight: 24,
-//     // fontWeight: '600',
-//   },
-//   ghost: {
-//     // fontSize: 32,
-//     // fontWeight: 'bold',
-//     // lineHeight: 32,
-//   },
-//   subtitle: {
-//     fontSize: 20,
-//     fontWeight: "bold",
-//   },
-//   link: {
-//     lineHeight: 30,
-//     fontSize: 16,
-//     color: "#0a7ea4",
-//   },
-// });
-
-const stylesFn = createStyleSheet(colors => ({
+const stylesFn = createStyleSheet(_colors => ({
   button: {
     paddingBlock: 4,
     borderRadius: 4,
@@ -122,25 +81,5 @@ const stylesFn = createStyleSheet(colors => ({
   buttonText: {
     textAlign: 'center',
     textTransform: 'uppercase',
-  },
-  primary: {},
-  secondary: {
-    // fontSize: 16,
-    // lineHeight: 24,
-    // fontWeight: '600',
-  },
-  ghost: {
-    // fontSize: 32,
-    // fontWeight: 'bold',
-    // lineHeight: 32,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
   },
 }));

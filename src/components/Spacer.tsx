@@ -1,4 +1,5 @@
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
+
 import {createStyleSheet, useStyles} from '../hooks/useStyles';
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
 const Spacer = ({height}: Props) => {
   const styles = useStyles(stylesFn);
 
-  return <View style={{...styles.spacer, height}}></View>;
+  return <View style={{...styles.spacer, height}} />;
 };
 
 export default Spacer;

@@ -1,7 +1,5 @@
-import {useCallback, useEffect, useState} from 'react';
-
-// since this doesn't have TS bindings
-// @ts-ignore
+import {useCallback, useEffect, useRef, useState} from 'react';
+// @ts-expect-error since this doesn't have TS bindings
 import Peer from 'react-native-peerjs';
 
 import {ImageStreamHandler} from '../classes/ImageHandler';
@@ -14,6 +12,8 @@ export const usePeer = (qrData: string) => {
   const [images, setImages] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isStreamingData, setIsStreamingData] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const isStreamingRef = useRef(false);
 
   const clearImages = useCallback(() => {
     setImages([]);
@@ -31,7 +31,9 @@ export const usePeer = (qrData: string) => {
         console.log('My peer ID:', myId);
 
         // 2. Then try to connect to the scanned peer
-        const decodedData = atob(qrData);
+        const decodedData = (
+          globalThis as typeof globalThis & {atob: (s: string) => string}
+        ).atob(qrData);
         setId(decodedData);
 
         // 3. Create connection
@@ -50,17 +52,18 @@ export const usePeer = (qrData: string) => {
           try {
             imageHandler.handleChunk(data);
 
-            if (!isStreamingData) {
-              setImages(imageHandler.getImages() ?? []);
+            if (!isStreamingRef.current) {
+              setImages(imageHandler.getImages());
             }
           } catch (error) {
             console.error('Error decoding received message:', error);
           }
         });
 
-        conn.on('error', (error: any) => {
-          console.error('Connection error:', error);
+        conn.on('error', (err: any) => {
+          console.error('Connection error:', err);
           setIsConnected(false);
+          setError(err?.message ?? 'Connection error');
         });
 
         conn.on('close', () => {
@@ -68,8 +71,9 @@ export const usePeer = (qrData: string) => {
           console.log('Connection closed');
         });
       });
-    } catch (error) {
-      console.error('Error in connection setup:', error);
+    } catch (err: any) {
+      console.error('Error in connection setup:', err);
+      setError(err?.message ?? 'Failed to connect');
     }
 
     return () => {
@@ -82,6 +86,7 @@ export const usePeer = (qrData: string) => {
     const unsubscribeStreaming = imageHandler.subscribe(
       'streamingStateChanged',
       (newState: boolean) => {
+        isStreamingRef.current = newState;
         setIsStreamingData(newState);
       },
     );
@@ -91,5 +96,13 @@ export const usePeer = (qrData: string) => {
     };
   }, []);
 
-  return {id, images, clearImages, isConnected, disconnect, isStreamingData};
+  return {
+    id,
+    images,
+    clearImages,
+    isConnected,
+    disconnect,
+    isStreamingData,
+    error,
+  };
 };

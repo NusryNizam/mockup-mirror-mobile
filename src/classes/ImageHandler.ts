@@ -1,35 +1,41 @@
-import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 import 'text-encoding';
 
+const PROTOCOL = {
+  STREAM_START: 'STREAM START',
+  STREAM_END: 'STREAM END',
+  START: 'START',
+  END: 'END',
+} as const;
+
 export class ImageStreamHandler {
+  private decoder = new TextDecoder();
   private currentImage: string[] = [];
   private images: string[] = [];
   private isReceiving = false;
-  private emitter = new EventEmitter();
+  private listeners: ((streaming: boolean) => void)[] = [];
 
   handleChunk(data: Uint8Array) {
-    const decoder = new TextDecoder();
-    const decodedData = decoder.decode(data);
+    const decodedData = this.decoder.decode(data);
 
     switch (decodedData) {
-      case 'STREAM START':
+      case PROTOCOL.STREAM_START:
         this.images = [];
-        this.emitter.emit('streamingStateChanged', true);
+        this.listeners.forEach(fn => fn(true));
         break;
 
-      case 'START':
+      case PROTOCOL.START:
         this.isReceiving = true;
         this.currentImage = [];
         break;
 
-      case 'END':
+      case PROTOCOL.END:
         this.isReceiving = false;
         this.images.push(this.currentImage.join(''));
         this.currentImage = [];
         break;
 
-      case 'STREAM END':
-        this.emitter.emit('streamingStateChanged', false);
+      case PROTOCOL.STREAM_END:
+        this.listeners.forEach(fn => fn(false));
         break;
 
       default:
@@ -39,19 +45,25 @@ export class ImageStreamHandler {
     }
   }
 
-  getImages() {
-    if (!this.isReceiving) {
-      return this.images.map(base64 => `data:image/png;base64,${base64}`);
+  getImages(): string[] {
+    if (this.isReceiving) {
+      return [];
     }
+    return this.images.map(base64 => `data:image/png;base64,${base64}`);
   }
 
   getIsReceiving() {
     return this.isReceiving;
   }
 
-  subscribe(event: 'streamingStateChanged', callback: (data: any) => void) {
-    this.emitter.addListener(event, callback);
-    return () => this.emitter.removeAllListeners();
+  subscribe(
+    _event: 'streamingStateChanged',
+    callback: (streaming: boolean) => void,
+  ) {
+    this.listeners.push(callback);
+    return () => {
+      this.listeners = this.listeners.filter(fn => fn !== callback);
+    };
   }
 
   reset() {

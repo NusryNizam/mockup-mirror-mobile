@@ -1,8 +1,7 @@
-import {Text, type TextProps, StyleSheet} from 'react-native';
-import React from 'react';
+import {Text, type TextProps} from 'react-native';
 
-import {createStyleSheet, useStyles} from '../hooks/useStyles';
 import {useColors} from '../contexts/ColorContext';
+import {createStyleSheet, useStyles} from '../hooks/useStyles';
 
 export type ThemedTextProps = TextProps & {
   color?: string;
@@ -28,19 +27,23 @@ export function ThemedText({
   const {colors} = useColors();
   const textColor = colors.foreground.primary;
 
+  const typeStyleMap = {
+    default: styles.default,
+    title: styles.title,
+    defaultSemiBold: styles.defaultSemiBold,
+    subtitle: styles.subtitle,
+    link: styles.link,
+    caption: styles.caption,
+    small: styles.small,
+  };
+
   return (
     <Text
       style={[
         {color: color ?? textColor},
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
-        type === 'caption' ? styles.caption : undefined,
-        type === 'small' ? styles.small : undefined,
-        style,
+        typeStyleMap[type],
         smallText ? styles.small : undefined,
+        style,
       ]}
       {...rest}
     />

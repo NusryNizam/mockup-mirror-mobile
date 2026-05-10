@@ -1,47 +1,43 @@
-import { StatusBar, useColorScheme } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ThemedButton } from '../components/ThemedButton';
-import { ThemedText } from '../components/ThemedText';
-import { ThemedView } from '../components/ThemedView';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/RootStackNavigator';
-import { ROOT_STACK_SCREENS } from '../navigation/constants';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {StatusBar} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {
-  useCameraPermission,
-  useCameraDevice,
   Camera,
   Code,
+  useCameraDevice,
+  useCameraPermission,
 } from 'react-native-vision-camera';
-import { DEVICE_WIDTH } from '../constants/constants';
-import { createStyleSheet, useStyles } from '../hooks/useStyles';
+
 import Spacer from '../components/Spacer';
-import { Colors } from '../constants/Colors';
+import {ThemedButton} from '../components/ThemedButton';
+import {ThemedText} from '../components/ThemedText';
+import {ThemedView} from '../components/ThemedView';
+import {DEVICE_WIDTH} from '../constants/constants';
+import {useColors} from '../contexts/ColorContext';
+import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import {ROOT_STACK_SCREENS} from '../navigation/constants';
+import {RootStackParamList} from '../navigation/RootStackNavigator';
 
 type Props = Readonly<
   NativeStackScreenProps<RootStackParamList, ROOT_STACK_SCREENS.PERMISSION>
 >;
 
-export default function PermissionScreen({ navigation }: Props) {
+export default function PermissionScreen({navigation}: Props) {
   const styles = useStyles(stylesFn);
-  const { hasPermission, requestPermission } = useCameraPermission();
+  const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
 
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode
-      ? Colors.dark.background.primary
-      : Colors.light.background.primary,
-  };
+  const {colors} = useColors();
+  const backgroundStyle = {backgroundColor: colors.background.primary};
 
   const handleScan = (result: Code[]) => {
-    navigation.replace(ROOT_STACK_SCREENS.HOME, { data: result[0].value ?? '' });
+    navigation.replace(ROOT_STACK_SCREENS.HOME, {data: result[0].value ?? ''});
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle="default"
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <ThemedView style={styles.stepContainer}>
@@ -52,7 +48,7 @@ export default function PermissionScreen({ navigation }: Props) {
         </ThemedText>
         <Spacer height={8} />
 
-        {device && hasPermission ? (
+        {hasPermission && device ? (
           <ThemedView style={styles.cameraWrapper}>
             <Camera
               device={device}
@@ -66,9 +62,15 @@ export default function PermissionScreen({ navigation }: Props) {
           </ThemedView>
         ) : null}
 
+        {hasPermission && !device ? (
+          <ThemedText style={styles.message}>
+            No camera found on this device
+          </ThemedText>
+        ) : null}
+
         {!hasPermission ? (
           <ThemedView>
-            <ThemedView style={styles.cameraPlaceholder}></ThemedView>
+            <ThemedView style={styles.cameraPlaceholder} />
             <Spacer height={8} />
             <ThemedText style={styles.message}>
               We need your permission to show the camera
@@ -82,23 +84,6 @@ export default function PermissionScreen({ navigation }: Props) {
 }
 
 const stylesFn = createStyleSheet(color => ({
-  container: {},
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
   stepContainer: {
     padding: 24,
     gap: 8,

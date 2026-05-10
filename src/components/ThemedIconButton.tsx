@@ -1,15 +1,10 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from 'react-native';
 import React from 'react';
+import {TouchableOpacity} from 'react-native';
 import {SvgProps} from 'react-native-svg';
-import {ThemedText} from './ThemedText';
+
 import {useColors} from '../contexts/ColorContext';
 import {createStyleSheet, useStyles} from '../hooks/useStyles';
+import {ThemedText} from './ThemedText';
 
 type Props = {
   Icon: React.FC<SvgProps>;
@@ -17,7 +12,7 @@ type Props = {
   onPress?: () => void;
   color?: string;
 };
-const ThemedIconButton = ({Icon, action, onPress, color}: Props) => {
+const ThemedIconButton = React.memo(({Icon, action, onPress, color}: Props) => {
   const styles = useStyles(stylesFn);
   const {colors} = useColors();
 
@@ -29,7 +24,7 @@ const ThemedIconButton = ({Icon, action, onPress, color}: Props) => {
       </ThemedText>
     </TouchableOpacity>
   );
-};
+});
 
 export default ThemedIconButton;
 
