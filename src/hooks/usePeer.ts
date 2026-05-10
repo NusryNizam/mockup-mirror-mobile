@@ -51,15 +51,12 @@ export const usePeer = (qrData: string) => {
         conn.on('data', async (data: Uint8Array) => {
           try {
             imageHandler.handleChunk(data);
-
-            if (!isStreamingRef.current) {
-              setImages(imageHandler.getImages());
-            }
-          } catch (error) {
-            console.error('Error decoding received message:', error);
+          } catch (err) {
+            console.error('Error decoding received message:', err);
           }
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         conn.on('error', (err: any) => {
           console.error('Connection error:', err);
           setIsConnected(false);
@@ -71,6 +68,7 @@ export const usePeer = (qrData: string) => {
           console.log('Connection closed');
         });
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error in connection setup:', err);
       setError(err?.message ?? 'Failed to connect');
@@ -88,11 +86,22 @@ export const usePeer = (qrData: string) => {
       (newState: boolean) => {
         isStreamingRef.current = newState;
         setIsStreamingData(newState);
+        if (newState) {
+          setImages([]);
+        }
+      },
+    );
+
+    const unsubscribeImageAdded = imageHandler.subscribe(
+      'imageAdded',
+      (updated: string[]) => {
+        setImages(updated);
       },
     );
 
     return () => {
       unsubscribeStreaming();
+      unsubscribeImageAdded();
     };
   }, []);
 
