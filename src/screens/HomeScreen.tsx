@@ -14,8 +14,8 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
-import AutoHeightImage from 'react-native-auto-height-image';
 
+import AutoHeightImage from '../components/AutoHeightImage';
 import Spacer from '../components/Spacer';
 import ThemedIcon from '../components/ThemedIcon';
 import ThemedIconButton from '../components/ThemedIconButton';
@@ -69,7 +69,7 @@ export default function HomeScreen({route}: Props) {
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}>
           <Pressable style={styles.button} onPress={() => setIsOverlay(true)} />
-          <AutoHeightImage width={DEVICE_WIDTH} source={{uri: item}} />
+          <AutoHeightImage width={DEVICE_WIDTH} uri={item} />
         </ScrollView>
       );
     },
@@ -107,14 +107,7 @@ export default function HomeScreen({route}: Props) {
 
         <Spacer height={32} />
         {error ? (
-          <ThemedText
-            type="small"
-            style={{
-              opacity: 0.7,
-              color: 'red',
-              textAlign: 'center',
-              marginBottom: 8,
-            }}>
+          <ThemedText type="small" style={styles.error}>
             {error}
           </ThemedText>
         ) : null}
@@ -133,6 +126,7 @@ export default function HomeScreen({route}: Props) {
     handleReconnect,
     styles.empty,
     styles.emptyText,
+    styles.error,
     styles.mainText,
     styles.row,
   ]);
@@ -246,5 +240,11 @@ const stylesFn = createStyleSheet(_color => ({
     backgroundColor: 'transparent',
     width: DEVICE_WIDTH,
     zIndex: 1,
+  },
+  error: {
+    opacity: 0.7,
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 8,
   },
 }));
