@@ -36,10 +36,7 @@ export default function PermissionScreen({navigation}: Props) {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle="default"
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
+      <StatusBar barStyle="default" />
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Setup Your Connection</ThemedText>
         <ThemedText>Scan the QR Code to get started</ThemedText>
