@@ -9502,7 +9502,6 @@ __metadata:
     prettier: 2.8.8
     react: 19.2.3
     react-native: 0.87.1
-    react-native-auto-height-image: ^3.2.4
     react-native-bootsplash: ^6.3.11
     react-native-peerjs: ^1.0.4
     react-native-safe-area-context: ^5.9.1
@@ -10276,7 +10275,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -10433,18 +10432,6 @@ __metadata:
   version: 19.2.6
   resolution: "react-is@npm:19.2.6"
   checksum: aad99621b2e5c47ea715ab719a3caae60b6d2be828374dc5ad663372f4603ab26bde5f0c9f3efd6107ed9152dfff5f8f3df044121967a3280e00796e4c560635
-  languageName: node
-  linkType: hard
-
-"react-native-auto-height-image@npm:^3.2.4":
-  version: 3.2.4
-  resolution: "react-native-auto-height-image@npm:3.2.4"
-  dependencies:
-    prop-types: "npm:^15.7.2"
-  peerDependencies:
-    react: ^17.0.0
-    react-native: ^0.63.0
-  checksum: 99d53a4a5859a24f89c58ac1d0d5cdc2377e25ebf3f8f335f67e2ac8a312b91d58aa514783970cc15ed3df6c052f4adaa51e1e85c1440d173cac7b148be92b9d
   languageName: node
   linkType: hard
 
