@@ -31,9 +31,23 @@ export const usePeer = (qrData: string) => {
         console.log('My peer ID:', myId);
 
         // 2. Then try to connect to the scanned peer
-        const decodedData = (
-          globalThis as typeof globalThis & {atob: (s: string) => string}
-        ).atob(qrData);
+        let decodedData: string;
+        try {
+          decodedData = (
+            globalThis as typeof globalThis & {atob: (s: string) => string}
+          ).atob(qrData);
+
+          if (!decodedData || typeof decodedData !== 'string') {
+            throw new Error(
+              'Invalid QR code: decoded data is empty or invalid',
+            );
+          }
+        } catch (decodeErr: unknown) {
+          console.error('Failed to decode QR code:', decodeErr);
+          setError('Invalid QR code. Please scan a valid code.');
+          return;
+        }
+
         setId(decodedData);
 
         // 3. Create connection
