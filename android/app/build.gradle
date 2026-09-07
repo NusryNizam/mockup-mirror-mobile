@@ -82,8 +82,8 @@ android {
         applicationId "com.nusrynizam.mockupmirror"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "2.0.4"
+        versionCode 10
+        versionName "2.0.5"
     }
     signingConfigs {
         debug {
